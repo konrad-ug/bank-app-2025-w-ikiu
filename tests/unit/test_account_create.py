@@ -65,4 +65,4 @@ class TestAccount:
     
     def test_promo_code_age_ok_wrong_code(self):
         account = Account("Alice", "Smith", "02270312345", "PROM_XY")
-        assert account.balance == 0
+        assert account.balance == 0.0

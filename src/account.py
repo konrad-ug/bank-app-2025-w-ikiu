@@ -23,4 +23,17 @@ class Account:
             year = 2000 + yy
         else:
             return False
-        return year > 1960        
+        return year > 1960
+
+    def incoming_transfer(self, amount):
+        if amount <= 0:
+            return False
+        self.balance += amount
+        return True
+
+    def outgoing_transfer(self, amount):
+        if amount <= 0 or amount > self.balance:
+            return False
+        self.balance -= amount
+        return True
+
