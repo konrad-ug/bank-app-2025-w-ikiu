@@ -26,4 +26,13 @@ class PersonalAccount(Account):
         else:
             return False
         return year > 1960
+    
+    def express_transfer(self, amount):
+        express_transfer_fee = 1.0
+        total = amount + express_transfer_fee
+        
+        if amount > 0 and (self.balance - total) >= express_transfer_fee*(-1):
+            self.balance -= (amount + express_transfer_fee)
+            return True
+        return False
 
