@@ -1,5 +1,5 @@
 class Account:
-    def __init__(self, first_name, last_name, pesel):
+    def __init__(self, first_name, last_name):
         self.balance = 0.0
 
     def incoming_transfer(self, amount):
