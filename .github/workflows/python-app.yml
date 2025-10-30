@@ -37,3 +37,7 @@ jobs:
     - name: Test with pytest
       run: |
         python3 -m coverage run --source=src -m pytest
+    - name: Show coverage
+      run: python3 -m coverage report
+    - name: Check coverage threshold
+      run: python -m coverage report --fail-under=100

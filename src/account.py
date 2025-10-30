@@ -13,3 +13,6 @@ class Account:
             return self.balance
         else:
             self.balance -= amount
+
+    def no_tests_method(self): 
+        return 4
