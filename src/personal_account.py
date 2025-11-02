@@ -34,6 +34,9 @@ class PersonalAccount(Account):
         
         if amount > 0 and (self.balance - total) >= express_transfer_fee*(-1):
             self.balance -= (amount + express_transfer_fee)
+
+            self.transfer_history.append(amount*(-1))
+            self.transfer_history.append(express_transfer_fee*(-1))
             return True
         return False
 
