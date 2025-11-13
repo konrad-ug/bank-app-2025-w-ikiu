@@ -39,4 +39,20 @@ class PersonalAccount(Account):
             self.transfer_history.append(express_transfer_fee*(-1))
             return True
         return False
+    
+    def submit_for_loan(self, amount):
+        if len(self.transfer_history) < 5:
+            return False
+        
+        if sum(self.transfer_history) < amount:
+            return False
+        
+        last_three = self.transfer_history[-3:]
+        if all(t > 0 for t in last_three):
+            self.balance += amount
+            self.transfer_history.append(amount)
+            return True
+        
+        return False
+
 
