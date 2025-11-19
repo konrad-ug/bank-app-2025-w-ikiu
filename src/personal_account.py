@@ -41,19 +41,19 @@ class PersonalAccount(Account):
         return False
     
     def submit_for_loan(self, amount):
-        three_incoming = False
-        if len(self.transfer_history) >= 3:
-            if all(t > 0 for t in self.transfer_history[-3:]):
-                three_incoming = True
-
-        sum_greater_than_loan = False
-        if len(self.transfer_history) >= 5:
-            if sum(self.transfer_history[-5:]) > amount:
-                sum_greater_than_loan = True
-
-        if three_incoming or sum_greater_than_loan:
+        if self._check_last_three_positive() or self._check_sum_greater_than_loan(amount):
             self.balance += amount
             return True
-            # self.transfer_history.append(amount)
         return False
+    
+    def _check_last_three_positive(self):
+        if len(self.transfer_history) < 3:
+            return False
+        return all(t > 0 for t in self.transfer_history[-3:])
+
+    def _check_sum_greater_than_loan(self, amount):
+        if len(self.transfer_history) < 5:
+            return False
+        return sum(self.transfer_history[-5:]) > amount
+
 

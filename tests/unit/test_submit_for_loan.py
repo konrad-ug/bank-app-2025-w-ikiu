@@ -1,100 +1,50 @@
+import pytest
 from src.personal_account import PersonalAccount
 
-def test_loan_success_3_transfers():
-    account = PersonalAccount("John", "Doe", "12345678900")
-    
-    account.incoming_transfer(100)
-    account.incoming_transfer(100)
-    account.incoming_transfer(100)
+@pytest.fixture
+def account():
+    return PersonalAccount("John", "Doe", "12345678900")
 
-    account.balance = 10.0 
-    result = account.submit_for_loan(500)
+@pytest.mark.parametrize("transfers, manual_balance, loan_amount, expected_result", [
     
-    assert result is True
-    assert account.balance == 510.0 
+    # 3 wplaty z rzedu -> sukces
+    ([100, 100, 100], None, 500, True),
+    
+    # wyplata w 3 ostatnich -> porazka
+    ([100, 100, -50], 1000.0, 500, False),
+    
+    # za krotka historia porazka
+    ([100, 100], None, 500, False),
 
-def test_loan_fail_last_negative_in_history():
-    account = PersonalAccount("John", "Doe", "12345678900")
-    
-    account.balance = 1000.0
-    
-    account.incoming_transfer(100)
-    account.incoming_transfer(100)
-    account.outgoing_transfer(100)
-    
-    result = account.submit_for_loan(500)
-    
-    assert result is False
-    assert account.balance == 1100.0
+    # warunek 1 nie ale warunek 2 tak -> sukces
+    ([1000, 1000, 1000, -100, 100], 5000.0, 2000, True),
 
-def test_loan_fail_no_history():
-    account = PersonalAccount("John", "Doe", "12345678900")
-    account.balance = 1000000.0
-    account.incoming_transfer(500)
+    # za mala suma -> porazka
+    ([10, 10, 10, -100, -100], 500.0, 1000, False),
     
-    result = account.submit_for_loan(500)
-    assert result is False
+    # ujemna suma ale 3 ostatnie dodatnie -> sukces
+    ([-2000, -2000, 10, 10, 10], 10000.0, 100, True),
 
+    # suma ok ale 3 ostatnie nie -> suma
+    ([1000, 1000, 1000, -100, 1000], 0.0, 1000, True),
+])
+def test_loan_scenarios(account, transfers, manual_balance, loan_amount, expected_result):
+    if manual_balance is not None:
+        account.balance = manual_balance
+    
+    for amount in transfers:
+        if amount > 0:
+            account.incoming_transfer(amount)
+        else:
+            account.outgoing_transfer(abs(amount))
 
-def test_loan_success_1_f_2_s():
-    account = PersonalAccount("John", "Doe", "12345678900")
-    
-    account.balance = 5000.0
-    
-    account.incoming_transfer(600)
-    account.incoming_transfer(600)
-    account.incoming_transfer(600)
-    account.outgoing_transfer(100)
-    account.incoming_transfer(200)
-    
-    account.balance = 100.0 
-    
-    result = account.submit_for_loan(1500)
-    
-    assert result is True
-    assert account.balance == 100.0 + 1500
+    balance_before = account.balance
 
-def test_loan_fail_f_2():
-    account = PersonalAccount("John", "Doe", "12345678900")
-    account.balance = 500.0
-    
-    account.incoming_transfer(10)
-    account.incoming_transfer(10)
-    account.incoming_transfer(10)
-    account.outgoing_transfer(100)
-    account.outgoing_transfer(100)
-    
-    result = account.submit_for_loan(1000)
-    assert result is False
+    result = account.submit_for_loan(loan_amount)
 
-def test_loan_fail_1_f_2_f():
-    account = PersonalAccount("John", "Doe", "12345678900")
-    account.balance = 200.0
+    assert result == expected_result
     
-    account.incoming_transfer(100)
-    account.incoming_transfer(100)
-    account.express_transfer(50)
-    
-    result = account.submit_for_loan(500)
-    assert result is False
-
-def test_loan_success_1_s_2_f():
-    account = PersonalAccount("John", "Doe", "12345678900")
-    account.balance = 10000.0
-    
-    account.outgoing_transfer(2000) 
-    account.outgoing_transfer(2000)
-
-    account.incoming_transfer(10)
-    account.incoming_transfer(10)
-    account.incoming_transfer(10)
-    
-    account.balance = 0.0
-    result = account.submit_for_loan(100)
-    
-    assert result is True
-    assert account.balance == 100.0
-
-
-
-        
+    if expected_result is True:
+        assert account.balance == balance_before + loan_amount
+    else:
+        assert account.balance == balance_before
