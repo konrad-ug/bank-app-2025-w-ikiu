@@ -18,3 +18,20 @@ class CompanyAccount(Account):
 
             return True
         return False
+    
+    def take_loan(self, amount):
+        if self._is_twice_as_big(amount) and self._zus_transfer_exists():
+            self.balance += amount
+            return True
+        return False
+
+    def _is_twice_as_big(self, amount):
+        if amount*2 <= self.balance:
+            return True
+        return False
+    
+    def _zus_transfer_exists(self):
+        if -1775 in self.transfer_history:
+            return True
+        else:
+            return False
