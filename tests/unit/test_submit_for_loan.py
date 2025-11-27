@@ -1,3 +1,5 @@
+# dla kont osobistych
+
 import pytest
 from src.personal_account import PersonalAccount
 
@@ -5,7 +7,7 @@ from src.personal_account import PersonalAccount
 def account():
     return PersonalAccount("John", "Doe", "12345678900")
 
-@pytest.mark.parametrize("transfers, manual_balance, loan_amount, expected_result", [
+@pytest.mark.parametrize("transfers, balance, loan_amount, expected_result", [
     
     # 3 wplaty z rzedu -> sukces
     ([100, 100, 100], None, 500, True),
@@ -28,9 +30,10 @@ def account():
     # suma ok ale 3 ostatnie nie -> suma
     ([1000, 1000, 1000, -100, 1000], 0.0, 1000, True),
 ])
-def test_loan_scenarios(account, transfers, manual_balance, loan_amount, expected_result):
-    if manual_balance is not None:
-        account.balance = manual_balance
+
+def test_loan_scenarios(account, transfers, balance, loan_amount, expected_result):
+    if balance is not None:
+        account.balance = balance
     
     for amount in transfers:
         if amount > 0:
