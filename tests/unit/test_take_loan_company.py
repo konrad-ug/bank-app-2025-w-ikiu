@@ -2,16 +2,10 @@
 
 import pytest
 from src.company_account import CompanyAccount
-# w company account do fixture jest name i nip, bede tez brac wartosc kredytu i historie wplat ale to do parametrize
 
 @pytest.fixture
 def account():
     return CompanyAccount("Firma ABC", "1234567890")
-
-# @pytest.mark.parametrize( "argumenty, w, takiej, formie", [
-#     (wartosci, w, takiej, formie),
-#     (nastepny, test)
-# ])
 
 @pytest.mark.parametrize("transfers, balance, loan_amount, expected_result", [
 
