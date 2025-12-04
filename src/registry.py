@@ -7,14 +7,22 @@ class AccountsRegistry:
     def add_account(self, account: PersonalAccount):
         self.accounts.append(account)
 
+    def number_of_accounts(self):
+        return len(self.accounts)
+
     def get_account_by_pesel(self, pesel):
         for account in self.accounts:
             if account.pesel == pesel:
                 return account
-            return None
-
+        return None
+    
     def get_all_accounts(self):
         return self.accounts
 
-    def number_of_accounts(self):
-        return len(self.accounts)
+    # usuwanie do feature 15
+    def delete_account(self, pesel):
+        account = self.get_account_by_pesel(pesel)
+        if account:
+            self.accounts.remove(account)
+            return True
+        return False
