@@ -11,7 +11,8 @@ def create_account():
     print(f"Request: create account {data}")
     
     account = PersonalAccount(data["name"], data["surname"], data["pesel"])
-    # registry.add_account(account)
+    
+    # feature 16
     success = registry.add_account(account)
 
     if success:
@@ -68,3 +69,35 @@ def delete_account(pesel):
         return jsonify({"message": "Account deleted"}), 200
     else:
         return jsonify({"message": "Account not found"}), 404
+
+# Feature 17: Przelewy
+@app.route("/api/accounts/<pesel>/transfer", methods=['POST'])
+def transfer(pesel):
+    data = request.get_json()
+    
+    if not data or "amount" not in data or "type" not in data:
+        return jsonify({"message": "Invalid request body"}), 400
+
+    account = registry.get_account_by_pesel(pesel)
+    if not account:
+        return jsonify({"message": "Account not found"}), 404
+    
+    amount = data["amount"]
+    transfer_type = data["type"]
+
+    success = False
+    if transfer_type == "incoming":
+        success = account.incoming_transfer(amount)
+    elif transfer_type == "outgoing":
+        success = account.outgoing_transfer(amount)
+    elif transfer_type == "express":
+        success = account.express_transfer(amount)
+    else:
+        return jsonify({"message": "Invalid transfer type"}), 400
+
+    if success:
+        # Komunikat zgodny z testem ze zdjęcia
+        return jsonify({"message": "Transfer successful"}), 200
+    else:
+        # Kod 422 i komunikat błędu zgodny z testem ze zdjęcia
+        return jsonify({"message": "There was an issue with transfer"}), 422
