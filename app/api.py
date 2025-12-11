@@ -70,7 +70,7 @@ def delete_account(pesel):
     else:
         return jsonify({"message": "Account not found"}), 404
 
-# Feature 17: Przelewy
+# feature 17
 @app.route("/api/accounts/<pesel>/transfer", methods=['POST'])
 def transfer(pesel):
     data = request.get_json()
@@ -96,8 +96,6 @@ def transfer(pesel):
         return jsonify({"message": "Invalid transfer type"}), 400
 
     if success:
-        # Komunikat zgodny z testem ze zdjęcia
         return jsonify({"message": "Transfer successful"}), 200
     else:
-        # Kod 422 i komunikat błędu zgodny z testem ze zdjęcia
         return jsonify({"message": "There was an issue with transfer"}), 422
