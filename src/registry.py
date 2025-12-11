@@ -5,7 +5,11 @@ class AccountsRegistry:
         self.accounts = []
 
     def add_account(self, account: PersonalAccount):
+        # sprawdzenie czy pesel istnieje
+        if self.get_account_by_pesel(account.pesel):
+            return False
         self.accounts.append(account)
+        return True
 
     def number_of_accounts(self):
         return len(self.accounts)

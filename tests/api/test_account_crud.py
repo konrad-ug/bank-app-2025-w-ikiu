@@ -24,10 +24,8 @@ def test_create_account(client):
 def test_get_account_by_pesel(client):
     client.post("/api/accounts", json={"name": "Jane", "surname": "Smith", "pesel": "22222222222"})
     
-    # Act: Pobierz
     response = client.get("/api/accounts/22222222222")
     
-    # Assert
     assert response.status_code == 200
     assert response.json["name"] == "Jane"
     assert response.json["balance"] == 0.0
@@ -58,6 +56,5 @@ def test_delete_account(client):
 def test_delete_account_not_found(client):
     response = client.delete("/api/accounts/99999999999")
     assert response.status_code == 404
-
 
 # etc/hosts
