@@ -99,3 +99,6 @@ def transfer(pesel):
         return jsonify({"message": "Transfer successful"}), 200
     else:
         return jsonify({"message": "There was an issue with transfer"}), 422
+    
+if __name__ == "__main__":
+    app.run(host="127.0.0.1", port=5000)
