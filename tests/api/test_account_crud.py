@@ -27,7 +27,8 @@ def test_get_account_by_pesel(client):
     response = client.get("/api/accounts/22222222222")
     
     assert response.status_code == 200
-    assert response.json["name"] == "Jane"
+    assert response.json["first_name"] == "Jane"
+    assert response.json["last_name"] == "Smith"
     assert response.json["balance"] == 0.0
 
 def test_get_account_not_found(client):

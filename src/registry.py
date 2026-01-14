@@ -30,3 +30,6 @@ class AccountsRegistry:
             self.accounts.remove(account)
             return True
         return False
+    
+    def cleanup(self):
+        self.accounts = []
