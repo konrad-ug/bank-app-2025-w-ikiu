@@ -10,7 +10,15 @@ def create_account():
     data = request.get_json()
     print(f"Request: create account {data}")
     
-    account = PersonalAccount(data["name"], data["surname"], data["pesel"])
+    # obsluga i firstname i po prostu name
+    first_name = data.get("first_name") or data.get("name")
+    last_name = data.get("last_name") or data.get("surname")
+    pesel = data.get("pesel")
+
+    if not (first_name and last_name and pesel):
+        return jsonify({"message": "Missing required data"}), 400
+
+    account = PersonalAccount(first_name, last_name, pesel)
     
     # feature 16
     success = registry.add_account(account)
@@ -25,7 +33,7 @@ def create_account():
 def get_all_accounts():
     accounts = registry.get_all_accounts()
     return jsonify([
-        {"name": acc.first_name, "surname": acc.last_name, "pesel": acc.pesel, "balance": acc.balance}
+        {"first_name": acc.first_name, "last_name": acc.last_name, "pesel": acc.pesel, "balance": acc.balance}
         for acc in accounts
     ]), 200
 
@@ -41,8 +49,8 @@ def get_account_by_pesel(pesel):
         return jsonify({"message": "Account not found"}), 404
     
     return jsonify({
-        "name": account.first_name,
-        "surname": account.last_name,
+        "first_name": account.first_name,
+        "last_name": account.last_name,
         "pesel": account.pesel,
         "balance": account.balance
     }), 200
@@ -55,9 +63,14 @@ def update_account(pesel):
     if not account:
         return jsonify({"message": "Account not found"}), 404
     
-    if "name" in data:
+    if "first_name" in data:
+        account.first_name = data["first_name"]
+    elif "name" in data:
         account.first_name = data["name"]
-    if "surname" in data:
+
+    if "last_name" in data:
+        account.last_name = data["last_name"]
+    elif "surname" in data:
         account.last_name = data["surname"]
     
     return jsonify({"message": "Account updated"}), 200
@@ -65,6 +78,7 @@ def update_account(pesel):
 @app.route("/api/accounts/<pesel>", methods=['DELETE'])
 def delete_account(pesel):
     is_deleted = registry.delete_account(pesel)
+
     if is_deleted:
         return jsonify({"message": "Account deleted"}), 200
     else:
@@ -75,7 +89,7 @@ def delete_account(pesel):
 def transfer(pesel):
     data = request.get_json()
     
-    if not data or "amount" not in data or "type" not in data:
+    if not data or "amount" not in data:
         return jsonify({"message": "Invalid request body"}), 400
 
     account = registry.get_account_by_pesel(pesel)
@@ -83,20 +97,22 @@ def transfer(pesel):
         return jsonify({"message": "Account not found"}), 404
     
     amount = data["amount"]
-    transfer_type = data["type"]
+    transfer_type = data.get("type", "incoming")
 
     success = False
     if transfer_type == "incoming":
-        success = account.incoming_transfer(amount)
+        account.incoming_transfer(amount)
+        success = True 
     elif transfer_type == "outgoing":
         success = account.outgoing_transfer(amount)
+        if success is None: success = True
     elif transfer_type == "express":
         success = account.express_transfer(amount)
     else:
         return jsonify({"message": "Invalid transfer type"}), 400
 
     if success:
-        return jsonify({"message": "Transfer successful"}), 200
+        return jsonify({"message": "Transfer successful", "balance": account.balance}), 200
     else:
         return jsonify({"message": "There was an issue with transfer"}), 422
     
