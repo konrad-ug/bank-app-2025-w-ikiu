@@ -1,4 +1,5 @@
 from src.account import Account
+from datetime import date
 
 class PersonalAccount(Account):
     def __init__(self, first_name, last_name, pesel, promo_code=None):
@@ -12,6 +13,15 @@ class PersonalAccount(Account):
 
     def is_pesel_valid(self, pesel):
         return isinstance(pesel, str) and len(pesel) == 11
+    
+    # do feature 19
+    def send_history_via_email(self, to_email, smtp_client):
+        today = date.today()
+        subject = f"Account Transfer History {today}"
+        
+        body = f"Personal account history: {self.transfer_history}"
+        
+        return smtp_client.send(subject, body, to_email)
     
     def is_promo_code_valid(self, promo_code):
         return isinstance(promo_code, str) and promo_code.startswith("PROM_") and len(promo_code) == 8

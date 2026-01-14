@@ -22,7 +22,7 @@ class CompanyAccount(Account):
 
     MF_DEFAULT_URL = "https://wl-test.mf.gov.pl"
 
-    
+    # do feature 18
     def _check_nip_in_mf(self, nip):
         base_url = os.getenv("BANK_APP_MF_URL", self.MF_DEFAULT_URL)
         today = date.today().isoformat()
@@ -45,6 +45,15 @@ class CompanyAccount(Account):
             
         except requests.RequestException:
             return False
+        
+    # feature 19 - wysylanie historii emailem
+    def send_history_via_email(self, to_email, smtp_client):
+        today = date.today()
+        subject = f"Account Transfer History {today}"
+        
+        body = f"Company account history: {self.transfer_history}"
+        
+        return smtp_client.send(subject, body, to_email)
 
     def express_transfer(self, amount):
         express_transfer_fee = 5.0
