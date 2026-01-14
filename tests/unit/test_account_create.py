@@ -69,7 +69,18 @@ class TestAccount:
 
     # testy dla company account
 
-    def test_company_account_nip_ok(self):
+    def test_company_account_nip_ok(self, mocker):
+        # mock do odpowiedzi
+        mock_response = mocker.Mock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {
+            "result": {
+                "subject": {
+                    "statusVat": "Czynny"
+                }
+            }
+        }
+        mocker.patch("src.company_account.requests.get", return_value=mock_response)
         account = CompanyAccount("Firma", "1234567890")
         assert account.nip == "1234567890"
 
