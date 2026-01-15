@@ -42,3 +42,15 @@ def test_registry_search_by_pesel(registry, pesel_to_find, should_find):
         assert found_account.pesel == pesel_to_find
     else:
         assert found_account is None
+
+def test_add_duplicate_account_returns_false(registry):
+    pesel = "12345678900"
+    acc1 = PersonalAccount("Jan", "Pierwszy", pesel)
+    assert registry.add_account(acc1) is True
+
+    acc2 = PersonalAccount("Anna", "Druga", pesel)
+    result = registry.add_account(acc2)
+
+    assert result is False
+
+    assert registry.number_of_accounts() == 1
