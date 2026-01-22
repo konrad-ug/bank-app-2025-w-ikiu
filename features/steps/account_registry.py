@@ -72,3 +72,11 @@ def field_equals_to(context, pesel, field, value):
     api_value = data.get(api_key)
     
     assert str(api_value) == str(value), f"Expected {field} to be {value}, but got {api_value}"
+
+@step('I make a transfer of type "{transfer_type}" with amount "{amount}" to account with pesel "{pesel}"')
+def make_transfer(context, transfer_type, amount, pesel):
+    json_body = {
+        "amount": float(amount),
+        "type": transfer_type
+    }
+    response = requests.post(URL + f"/api/accounts/{pesel}/transfer", json=json_body)
