@@ -65,5 +65,13 @@ class PersonalAccount(Account):
         if len(self.transfer_history) < 5:
             return False
         return sum(self.transfer_history[-5:]) > amount
+    
+    def to_dict(self):
+        return {
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "pesel": self.pesel,
+            "balance": self.balance,
+        }
 
 

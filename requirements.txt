@@ -5,3 +5,4 @@ flask
 requests
 pytest-mock
 behave
+pymongo
