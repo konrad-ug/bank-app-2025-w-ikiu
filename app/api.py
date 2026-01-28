@@ -1,9 +1,11 @@
 from flask import Flask, request, jsonify
 from src.personal_account import PersonalAccount
 from src.registry import AccountsRegistry
+from src.accounts_repository import MongoAccountsRepository
 
 app = Flask(__name__)
 registry = AccountsRegistry()
+repository = MongoAccountsRepository()
 
 @app.route("/api/accounts", methods=['POST'])
 def create_account():
@@ -115,6 +117,23 @@ def transfer(pesel):
         return jsonify({"message": "Transfer successful", "balance": account.balance}), 200
     else:
         return jsonify({"message": "There was an issue with transfer"}), 422
+    
+@app.route("/api/accounts/save", methods=['POST'])
+def save_registry():
+    try:
+        repository.save_all(registry)
+        return jsonify({"message": "Registry saved to database"}), 200
+    except Exception as e:
+        # Ten błąd wystąpi u Ciebie lokalnie (brak Dockera), ale na GitHubie przejdzie
+        return jsonify({"message": f"Database error: {str(e)}"}), 500
+
+@app.route("/api/accounts/load", methods=['POST'])
+def load_registry():
+    try:
+        repository.load_all(registry)
+        return jsonify({"message": "Registry loaded from database"}), 200
+    except Exception as e:
+        return jsonify({"message": f"Database error: {str(e)}"}), 500
     
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5000)

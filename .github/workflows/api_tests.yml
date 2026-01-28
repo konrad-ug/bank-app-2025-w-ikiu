@@ -1,14 +1,16 @@
 name: API Tests
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+on: [push, pull_request]
 
 jobs:
   api-tests:
     runs-on: ubuntu-latest
+
+    services:
+      mongo:
+        image: mongo:latest
+        ports:
+          - 27017:27017
 
     steps:
     - uses: actions/checkout@v4
@@ -27,10 +29,11 @@ jobs:
       run: |
         export FLASK_APP=app/api.py
         export FLASK_ENV=development
+        export PYTHONPATH=$GITHUB_WORKSPACE
         flask run &
         sleep 5
 
-    - name: Execute API tests
+    - name: Execute API Tests
       run: |
-        # uruchamiamy testy z folderu api
+        export PYTHONPATH=$GITHUB_WORKSPACE
         python -m pytest tests/api

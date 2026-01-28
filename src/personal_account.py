@@ -2,14 +2,17 @@ from src.account import Account
 from datetime import date
 
 class PersonalAccount(Account):
-    def __init__(self, first_name, last_name, pesel, promo_code=None):
+    def __init__(self, first_name, last_name, pesel, promo_code=None, balance=None):
         super().__init__(first_name, last_name)
         self.first_name = first_name
         self.last_name = last_name
-
         self.pesel = pesel if self.is_pesel_valid(pesel) else "Invalid"
+        self.transfer_history = []
 
-        self.balance = 50 if self.can_get_promo(pesel) and self.is_promo_code_valid(promo_code) else 0.0
+        if balance is not None:
+            self.balance = float(balance)
+        else:
+            self.balance = 50 if self.can_get_promo(pesel) and self.is_promo_code_valid(promo_code) else 0.0
 
     def is_pesel_valid(self, pesel):
         return isinstance(pesel, str) and len(pesel) == 11
@@ -65,5 +68,12 @@ class PersonalAccount(Account):
         if len(self.transfer_history) < 5:
             return False
         return sum(self.transfer_history[-5:]) > amount
-
-
+    
+    def to_dict(self):
+        return {
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "pesel": self.pesel,
+            "balance": self.balance,
+            "history": self.transfer_history
+        }
